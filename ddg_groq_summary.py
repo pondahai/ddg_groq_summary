@@ -96,9 +96,13 @@ def stream_chat_completions(prompt, max_retries=3):
 if __name__ == "__main__":
     query = input("請輸入搜尋關鍵字：")
     
-    parsing_question = "接下來我會輸入一個提問，你根據這個這項提問，生成三條要在搜尋引擎尋找背景資料的關鍵字in zh_TW，不用回答細節，不用題號，只要輸出關鍵字，每條用一行，Reply in zh_TW: "
-    line = ""
     lines = [""]
+    line = ""
+    parsing_question = "接下來我會輸入一個提問，你根據這個這項提問，根據正面表述原則生成三條要在搜尋引擎尋找背景資料的關鍵字in zh_TW，不用回答細節，不用題號，不輸出角色提示字，只要輸出關鍵字，每個關鍵字用一行，Reply in zh_TW: "
+    for response in stream_chat_completions(parsing_question + query):
+        line += response
+    line += "\n"
+    parsing_question = "接下來我會輸入一個提問，你根據這個這項提問，根據反面表述原則生成三條要在搜尋引擎尋找背景資料的關鍵字in zh_TW，不用回答細節，不用題號，不輸出角色提示字，只要輸出關鍵字，每個關鍵字用一行，Reply in zh_TW: "
     for response in stream_chat_completions(parsing_question + query):
         line += response
 
@@ -107,7 +111,7 @@ if __name__ == "__main__":
     print()
     result = []
     
-    if len(lines) == 3:
+    if len(lines) == 6:
         for ask in lines:
             result += search_duckduckgo(ask)
 
@@ -131,12 +135,12 @@ if __name__ == "__main__":
                     print()
                     print()
                 
-                print('++++++++++++++++++++')
-                print(total)
-                print('++++++++++++++++++++')
-                prompt = total + '\n你先用zh_TW回答分析這篇文字並且特別強調提到的數字\n然後給出基於這篇文字事實的總結短文. Reply in zh_TW.'
-                for content in stream_chat_completions(prompt):
-                    print(content, end='', flush=True)
+        print('++++++++++++++++++++')
+        print(total)
+        print('++++++++++++++++++++')
+        prompt = total + f'\n你先用zh_TW回答分析這篇文字並且特別強調提到的數字\n基於這篇文字事實回答下列問題:{query}. Reply in and only in zh_TW.'
+        for content in stream_chat_completions(prompt):
+            print(content, end='', flush=True)
          
     else:
         for answer in lines:
