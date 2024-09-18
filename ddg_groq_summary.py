@@ -111,34 +111,37 @@ if __name__ == "__main__":
     print()
     result = []
     
-    if len(lines) == 6:
+    if len(lines) >= 3:
         for ask in lines:
-            result += search_duckduckgo(ask)
+            if len(ask) > 0:
+                time.sleep(0.3)
+                result += search_duckduckgo(ask)
 
-            total = ''
+                total = ''
 
-            if result:
-                # 假設 result 是列表形式，需要迭代處理
-                for item in result:  # 你可能需要解析 result 得到真正的項目列表
-                    print('--------------------')
-                    print(item['body'])
-                    print('====================')
+                if result:
+                    # 假設 result 是列表形式，需要迭代處理
+                    for item in result:  # 你可能需要解析 result 得到真正的項目列表
+                        print('--------------------')
+                        print(item['body'])
+                        print('====================')
 
 
-        #             prompt = item['body'] + '\n我用少數幾句zh_TW總結這一段文字並且強調文中提到的數字. Reply in zh_TW.'
-        # 
-        #             for content in stream_chat_completions(prompt):
-        #                 total += content
-        #                 print(content, end='', flush=True)
+            #             prompt = item['body'] + '\n我用少數幾句zh_TW總結這一段文字並且強調文中提到的數字. Reply in zh_TW.'
+            # 
+            #             for content in stream_chat_completions(prompt):
+            #                 total += content
+            #                 print(content, end='', flush=True)
+                        
+                        total += item['body']
+                        print()
+                        print()
                     
-                    total += item['body']
-                    print()
-                    print()
-                
         print('++++++++++++++++++++')
         print(total)
         print('++++++++++++++++++++')
-        prompt = total + f'\n你先用zh_TW回答分析這篇文字並且特別強調提到的數字\n基於這篇文字事實回答下列問題:{query}. Reply in and only in zh_TW.'
+        prompt = total + f'\n執行兩個動作\n首先分析並解釋這篇文字提到的數字\n然後基於這篇文字事實回答下列問題:{query}. Reply in and only in zh_TW.'
+        print(prompt)
         for content in stream_chat_completions(prompt):
             print(content, end='', flush=True)
          
